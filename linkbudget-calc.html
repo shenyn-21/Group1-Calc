@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Link Budget Calculator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <img src="logo-link.png" alt="Logo">
+    </div>
+    <style>
+        .logo {
+            margin: 0px;
+        }
+        .logo img {
+        max-width: 80px;
+        height: fit-content;
+        }
+    </style>
+  </header>
+  <style>
+    body {
+      margin: 30;
+      margin-bottom: 0%;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-image: url('bck-link.jpg');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      color: white;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      color: #ddd;
+      margin-top: 50px;
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      font-size: 1.5rem;
+      margin-top: 0;
+      margin-bottom: 30px;
+    }
+
+    p {
+      line-height: 1.5;
+      text-align: left;
+    }
+  </style>
+  <style>
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      backdrop-filter: rgba(255, 255, 255, 0.5);
+    }
+    th, td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    input[type=number] {
+      width: 80px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Link Budget Calculator</h1> 
+
+  <table>
+    <tr>
+      <th>Parameter
+        <style>
+            body {
+                color: #ddd;
+                font-weight: bold;
+                background-blend-mode: darken;
+            }
+            input {
+                background-color: transparent;
+                border: 2px solid rgba(255, 255, 255, 0.5);
+                border-radius: 5px;
+                outline: none;
+                font-size: 16px;
+                font-weight: bold;
+                text-align: center;
+                width: 100%;
+                padding: 5px 10px;
+                box-sizing: border-box;
+                color: white;
+            }
+        </style>
+      </th>
+      <th>Value</th>
+      <th>Unit</th>
+    </tr>
+    <tr>
+      <td>Transmitter Power Output</td>
+      <td><input type="number" id="txPower" min="0" step="0.0001"></td>
+      <td>dBm</td>
+    </tr>
+    <tr>
+      <td>Transmitter Feedline Loss</td>
+      <td><input type="number" id="txFeedlineLoss" min="0" step="0.0001"></td>
+      <td>dB</td>
+    </tr>
+    <tr>
+      <td>Transmitter Antenna Gain</td>
+      <td><input type="number" id="txAntennaGain" min="0" step="0.0001"></td>
+      <td>dB</td>
+    </tr>
+    <tr>
+      <td>Free-Space Loss</td>
+      <td><input type="number" id="fsl" min="0" step="0.0001"></td>
+      <td>dB</td>
+    </tr>
+    <tr>
+      <td>Radome Loss</td>
+      <td><input type="number" id="RadomeLoss" min="0" step="0.0001"></td>
+      <td>dB</td>
+    </tr>
+    <tr>
+      <td>Other Losses</td>
+      <td><input type="number" id="otherLosses" min="0" step="0.0001"></td>
+      <td>dB</td>
+    </tr>
+    <tr>
+      <td>Receiver Antenna Gain</td>
+      <td><input type="number" id="rxAntennaGain" min="0" step="0.0001"></td>
+      <td>dB</td>
+    </tr>
+    <tr>
+      <td>Receiver Feedline Loss</td>
+      <td><input type="number" id="rxFeedlineLoss" min="0" step="0.0001"></td>
+      <td>dB</td>
+    </tr>
+    <tr>
+      <td>Receiver Sensitivity</td>
+      <td><input type="number" id="rxSensitivity" min="0" step="0.0001"></td>
+      <td>dBm</td>
+    </tr>
+  </table>
+  
+  <button onclick="calculateLinkBudget()">Calculate</button>
+  
+  <div id="results">
+    <h2>Link Budget Results:</h2>
+    <p>Received Signal Power: <span id="receivedSignalPower"></span> dBm</p>
+    <p>Link Margin: <span id="linkMargin"></span> dB</p>
+    <p id="linkStatus"></p>
+    <h2>Parabolic Antenna Gain, FSL, and Noise Threshold Calculator</h2>
+    <table>
+      <tr>
+        <th>Parameter</th>
+        <th>Value</th>
+      </tr>
+      <tr>
+        <td>Dish Diameter</td>
+        <td>
+            <input type="number" id="dishDiameter"min="0" step="0.0001">
+            <select id="dishDiameter">
+                <option value="feet">ft</option>
+                <option value="meter">m</option>
+            </select>
+            <style>
+                 body {
+                    color: #ddd;
+                }
+                select {
+                    font-family: Arial, sans-serif;
+                    background-color: transparent;
+                    border: 2px solid rgba(255, 255, 255, 0.5);
+                    border-radius: 5px;
+                    color: white;
+                    padding: 5px 10px;
+                    font-size: 14px;
+                    appearance: none;
+                    -webkit-appearance: none;
+                    -moz-appearance: none;
+                    background-repeat: no-repeat;
+                    background-position: right 5px center;
+                    background-size: 20px;
+                    width: 10%;
+                    box-sizing: border-box;
+                }
+                select option {
+                    background-color: transparent;
+                    color: #333;
+                }
+            </style>
+        </td>
+      </tr>
+      <tr>
+        <td>Frequency</td>
+        <td>
+            <input type="number" id="frequency" min="0" step="0.0001">
+            <select id="frequency">
+                <option value="GHz">GHz</option>
+                <option value="MHz">MHz</option>
+            </select>
+        </td>
+      </tr>
+      <tr>
+        <td>Bandwidth</td>
+        <td>
+            <input type="number" id="bandwidth"min="0" step="0.0001">
+            <select id="bandwidth">
+                <option value="GHz">GHz</option>
+                <option value="MHz">MHz</option>
+            </select>
+        </td>
+      </tr>
+      <tr>
+        <td>Distance</td>
+        <td>
+            <input type="number" id="distance"min="0" step="0.0001">
+            <select id="distance">
+                <option value="miles">mi</option>
+                <option value="kilometer">km</option>
+        </td>
+      </tr>
+    </table>
+    <button onclick="calculateAntennaGain()">Calculate
+        <style>
+            button {
+            background: linear-gradient(to right, rgba(76, 175, 80, 0.5), rgba(76, 175, 80, 0.8));
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-family: Arial, sans-serif;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        </style>
+    </button>
+    <p>Parabolic Antenna Gain: <span id="antennaGain"></span> dBi</p>
+    <p>Free Space Loss (FSL): <span id="fsl2"></span> dB</p>
+    <p>Noise Threshold: <span id="noiseThreshold"></span> dBm</p>
+    <div id="chart"></div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    function calculateLinkBudget() {
+      const txPower = parseFloat(document.getElementById('txPower').value);
+      const fsl = parseFloat(document.getElementById('fsl').value);
+      const txFeedlineLoss = parseFloat(document.getElementById('txFeedlineLoss').value);
+      const txAntennaGain = parseFloat(document.getElementById('txAntennaGain').value);
+      const RadomeLoss = parseFloat(document.getElementById('RadomeLoss').value);
+      const otherLosses = parseFloat(document.getElementById('otherLosses').value);
+      const rxAntennaGain = parseFloat(document.getElementById('rxAntennaGain').value);
+      const rxFeedlineLoss = parseFloat(document.getElementById('rxFeedlineLoss').value);
+      const rxSensitivity = parseFloat(document.getElementById('rxSensitivity').value);
+
+      const receivedSignalPower = txPower - fsl - txFeedlineLoss + txAntennaGain - RadomeLoss - otherLosses + rxAntennaGain - rxFeedlineLoss;
+      const linkMargin = receivedSignalPower - rxSensitivity;
+
+      document.getElementById('receivedSignalPower').textContent = receivedSignalPower.toFixed(2);
+      document.getElementById('linkMargin').textContent = linkMargin.toFixed(2);
+      document.getElementById('results').style.display = 'block';
+
+      if (linkMargin > 0) {
+        document.getElementById('linkStatus').textContent = 'The link will work!';
+        document.getElementById('linkStatus').style.textAlign = 'center';
+        document.getElementById('linkStatus').style.fontWeight = 'bold';
+        document.getElementById('linkStatus').style.fontSize = '30px';
+        document.getElementById('linkStatus').style.color = 'green';
+        
+      } else {
+        document.getElementById('linkStatus').textContent = 'The link will not work!';
+        document.getElementById('linkStatus').style.textAlign = 'center';
+        document.getElementById('linkStatus').style.fontWeight = 'bold';
+        document.getElementById('linkStatus').style.fontSize = '30px';
+        document.getElementById('linkStatus').style.color = 'red';
+      }
+    }
+
+    function calculateAntennaGain() {
+      const dishDiameter = parseFloat(document.getElementById('dishDiameter').value);
+      const frequency = parseFloat(document.getElementById('frequency').value);
+      const bandwidth = parseFloat(document.getElementById('bandwidth').value);
+      const distance = parseFloat(document.getElementById('distance').value);
+
+      let antennaGainfactor = 0;
+      if (dishDiameter === 'feet') {
+        antennaGainfactor = 7.5;
+      } else {
+        antennaGainfactor = 17.8;
+      }
+
+      const antennaGain = antennaGainfactor + 20 * Math.log10(dishDiameter) + 20 * Math.log10(frequency);
+
+      let fslfactor = 0;
+      if (distance === 'miles') {
+        fslfactor = 96.6;
+      } else {
+        fslfactor = 92.4;
+      }
+
+      const fsl2 = fslfactor + 20 * Math.log10(frequency) + 20 * Math.log10(distance);
+
+      const noiseThreshold = -174 + 10 * Math.log10(bandwidth * 1000000) + 3;
+
+
+      document.getElementById('antennaGain').textContent = antennaGain.toFixed(2);
+      document.getElementById('fsl2').textContent = fsl2.toFixed(2);
+      document.getElementById('noiseThreshold').textContent = noiseThreshold.toFixed(2);
+      
+      };
+      
+  </script>
+</body>
+</html>
