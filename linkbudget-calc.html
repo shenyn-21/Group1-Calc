@@ -50,11 +50,16 @@
     }
 
     h2 {
-      font-size: 1.5rem;
+      font-size: 1rem;
       margin-top: 0;
       margin-bottom: 30px;
     }
 
+    h3 {
+      font-size: 1.5rem;
+      margin-top: 5px;
+      margin-bottom: 30px;
+    }
     p {
       line-height: 1.5;
       text-align: left;
@@ -78,7 +83,8 @@
   </style>
 </head>
 <body>
-  <h1>Link Budget Calculator</h1> 
+  <h1>Link Budget Calculator</h1>
+  <h2>Welcome to Group 1's Link Budget Calculator.</h2> 
 
   <table>
     <tr>
@@ -157,7 +163,7 @@
   <button onclick="calculateLinkBudget()">Calculate</button>
   
   <div id="results">
-    <h2>Link Budget Results:</h2>
+    <h3>Link Budget Results:</h3>
     <p>Received Signal Power: <span id="receivedSignalPower"></span> dBm</p>
     <p>Link Margin: <span id="linkMargin"></span> dB</p>
     <p id="linkStatus"></p>
