@@ -164,50 +164,15 @@
   
   <div id="results">
     <h3>Link Budget Results:</h3>
-    <p>Received Signal Power: <span id="receivedSignalPower"></span> dBm</p>
+    <p>Received Signal Level: <span id="receivedSignalLevel"></span> dBm</p>
     <p>Link Margin: <span id="linkMargin"></span> dB</p>
     <p id="linkStatus"></p>
-    <h3>Parabolic Antenna Gain, FSL, and Noise Threshold Calculator</h3>
+    <h3>System Parameters Calculator</h3>
+    <h2>System Gain, Fade Margin, FSL, Noise Threshold, & SNR</h2>
     <table>
       <tr>
         <th>Parameter</th>
         <th>Value</th>
-      </tr>
-      <tr>
-        <td>Dish Diameter</td>
-        <td>
-            <input type="number" id="dishDiameter"min="0" step="0.0001">
-            <select id="dishDiameter">
-                <option value="feet">ft</option>
-                <option value="meter">m</option>
-            </select>
-            <style>
-                 body {
-                    color: #ddd;
-                }
-                select {
-                    font-family: Arial, sans-serif;
-                    background-color: transparent;
-                    border: 2px solid rgba(255, 255, 255, 0.5);
-                    border-radius: 5px;
-                    color: white;
-                    padding: 5px 10px;
-                    font-size: 14px;
-                    appearance: none;
-                    -webkit-appearance: none;
-                    -moz-appearance: none;
-                    background-repeat: no-repeat;
-                    background-position: right 5px center;
-                    background-size: 20px;
-                    width: 10%;
-                    box-sizing: border-box;
-                }
-                select option {
-                    background-color: transparent;
-                    color: #333;
-                }
-            </style>
-        </td>
       </tr>
       <tr>
         <td>Frequency</td>
@@ -217,6 +182,32 @@
                 <option value="GHz">GHz</option>
                 <option value="MHz">MHz</option>
             </select>
+            <style>
+              body {
+                 color: #ddd;
+             }
+             select {
+                 font-family: Arial, sans-serif;
+                 background-color: transparent;
+                 border: 2px solid rgba(255, 255, 255, 0.5);
+                 border-radius: 5px;
+                 color: white;
+                 padding: 5px 10px;
+                 font-size: 14px;
+                 appearance: none;
+                 -webkit-appearance: none;
+                 -moz-appearance: none;
+                 background-repeat: no-repeat;
+                 background-position: right 5px center;
+                 background-size: 20px;
+                 width: 10%;
+                 box-sizing: border-box;
+             }
+             select option {
+                 background-color: transparent;
+                 color: #333;
+             }
+         </style>
         </td>
       </tr>
       <tr>
@@ -238,8 +229,20 @@
                 <option value="kilometer">km</option>
         </td>
       </tr>
+      <tr>
+        <td>Roughness Factor</td>
+        <td>
+            <input type="number" id="roughnessFactor"min="0" step="0.0001">
+        </td>
+      </tr>
+      <tr>
+        <td>Climate Factor</td>
+        <td>
+            <input type="number" id="climateFactor"min="0" step="0.0001">
+        </td>
+      </tr>
     </table>
-    <button onclick="calculateAntennaGain()">Calculate
+    <button onclick="calculatesystemGain()">Calculate
         <style>
             button {
             background: linear-gradient(to right, rgba(76, 175, 80, 0.5), rgba(76, 175, 80, 0.8));
@@ -257,9 +260,11 @@
         }
         </style>
     </button>
-    <p>Parabolic Antenna Gain: <span id="antennaGain"></span> dBi</p>
+    <p>System Gain: <span id="systemGain"></span> dB</p>
+    <p>Fade Margin: <span id="fadeMargin"></span> dB</p>
     <p>Free Space Loss (FSL): <span id="fsl2"></span> dB</p>
     <p>Noise Threshold: <span id="noiseThreshold"></span> dBm</p>
+    <p>Signal-to-Noise Ratio (SNR): <span id="snr"></span> dB</p>
     <div id="chart"></div>
   </div>
   
@@ -276,10 +281,11 @@
       const rxFeedlineLoss = parseFloat(document.getElementById('rxFeedlineLoss').value);
       const rxSensitivity = parseFloat(document.getElementById('rxSensitivity').value);
 
-      const receivedSignalPower = txPower - fsl - txFeedlineLoss + txAntennaGain - RadomeLoss - otherLosses + rxAntennaGain - rxFeedlineLoss;
-      const linkMargin = receivedSignalPower - rxSensitivity;
 
-      document.getElementById('receivedSignalPower').textContent = receivedSignalPower.toFixed(2);
+      const receivedSignalLevel = txPower - fsl - txFeedlineLoss + txAntennaGain - RadomeLoss - otherLosses + rxAntennaGain - rxFeedlineLoss;
+      const linkMargin = receivedSignalLevel - rxSensitivity;
+
+      document.getElementById('receivedSignalLevel').textContent = receivedSignalLevel.toFixed(2);
       document.getElementById('linkMargin').textContent = linkMargin.toFixed(2);
       document.getElementById('results').style.display = 'block';
 
@@ -299,21 +305,23 @@
       }
     }
 
-    function calculateAntennaGain() {
-      const dishDiameter = parseFloat(document.getElementById('dishDiameter').value);
+    function calculatesystemGain() {
       const frequency = parseFloat(document.getElementById('frequency').value);
       const bandwidth = parseFloat(document.getElementById('bandwidth').value);
       const distance = parseFloat(document.getElementById('distance').value);
+      const roughnessFactor = parseFloat(document.getElementById('roughnessFactor').value);
+      const climateFactor = parseFloat(document.getElementById('climateFactor').value);
+      const txPower = parseFloat(document.getElementById('txPower').value);
+      const txFeedlineLoss = parseFloat(document.getElementById('txFeedlineLoss').value);
+      const txAntennaGain = parseFloat(document.getElementById('txAntennaGain').value);
+      const RadomeLoss = parseFloat(document.getElementById('RadomeLoss').value);
+      const otherLosses = parseFloat(document.getElementById('otherLosses').value);
+      const rxAntennaGain = parseFloat(document.getElementById('rxAntennaGain').value);
+      const rxFeedlineLoss = parseFloat(document.getElementById('rxFeedlineLoss').value);
+      const rxSensitivity = parseFloat(document.getElementById('rxSensitivity').value);
 
-      let antennaGainfactor = 0;
-      if (dishDiameter === 'feet') {
-        antennaGainfactor = 7.5;
-      } else {
-        antennaGainfactor = 17.8;
-      }
-
-      const antennaGain = antennaGainfactor + 20 * Math.log10(dishDiameter) + 20 * Math.log10(frequency);
-
+      const fadeMargin = 30 * Math.log10(distance) + 10 * Math.log10(6 * frequency * roughnessFactor * climateFactor) - 10 * Math.log10(1-0.99999) - 70;
+      
       let fslfactor = 0;
       if (distance === 'miles') {
         fslfactor = 96.6;
@@ -322,16 +330,19 @@
       }
 
       const fsl2 = fslfactor + 20 * Math.log10(frequency) + 20 * Math.log10(distance);
-
+      const systemGain = (fadeMargin + txFeedlineLoss + rxFeedlineLoss + fsl2) - (txAntennaGain + rxAntennaGain);
+      const receivedSignalLevel = txPower - fsl2 - txFeedlineLoss + txAntennaGain - RadomeLoss - otherLosses + rxAntennaGain - rxFeedlineLoss;
       const noiseThreshold = -174 + 10 * Math.log10(bandwidth * 1000000) + 3;
+      const snr = receivedSignalLevel - noiseThreshold + 30;
 
-
-      document.getElementById('antennaGain').textContent = antennaGain.toFixed(2);
+      document.getElementById('systemGain').textContent = systemGain.toFixed(2);
+      document.getElementById('fadeMargin').textContent = fadeMargin.toFixed(2);
       document.getElementById('fsl2').textContent = fsl2.toFixed(2);
       document.getElementById('noiseThreshold').textContent = noiseThreshold.toFixed(2);
+      document.getElementById('snr').textContent = snr.toFixed(2);
       
-      };
-      
+      }
+
   </script>
 </body>
 </html>
